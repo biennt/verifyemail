@@ -4,7 +4,7 @@
 require_once('smtp_validateEmail.class.php');
 
 // the email to validate
-$email = $_POST['email'];
+$email = $_GET['email'];
 // an optional sender
 $sender = 'bien@ybaonline.com';
 
