@@ -93,17 +93,14 @@ class SMTP_validateEmail
      * Set the Emails to validate
      * @param $emails Array List of Emails
      */
-    function setEmails($emails)
+    function setEmails($email)
     {
-        foreach ($emails as $email)
+        list($user, $domain) = $this->_parseEmail($email);
+        if (!isset($this->domains[$domain]))
         {
-            list($user, $domain) = $this->_parseEmail($email);
-            if (!isset($this->domains[$domain]))
-            {
-                $this->domains[$domain] = array();
-            }
-            $this->domains[$domain][] = $user;
+            $this->domains[$domain] = array();
         }
+        $this->domains[$domain][] = $user;
     }
 
     /**
@@ -175,6 +172,7 @@ class SMTP_validateEmail
                 }
             }
 
+            $results['email'] = $emails;
             // did we get a TCP socket
             if ($this->sock)
             {
@@ -191,7 +189,6 @@ class SMTP_validateEmail
                     {
                         $results['is_valid'] = false;
                         // $results[$user.'@'.$domain] = false;
-                        $results['email'] = $user . '@' . $domain;
                     }
                     continue;
                 }
@@ -249,6 +246,10 @@ class SMTP_validateEmail
                 // close socket
                 fclose($this->sock);
 
+            }
+            else 
+            {
+                $results['is_valid'] = false;
             }
         }
         return $results;
