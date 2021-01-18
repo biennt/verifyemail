@@ -180,14 +180,20 @@ class SMTP_validateEmail
                 $this->debug("<<<\n$reply");
 
                 preg_match('/^([0-9]{3}) /ims', $reply, $matches);
+                $this->debug("\n");
+                $this->debug(print_r($matches, 1));
+                $this->debug("\n");
                 $code = isset($matches[1]) ? $matches[1] : '';
-
+                $this->debug("\n$code\n");
                 if ($code != '220')
                 {
                     // MTA gave an error...
                     foreach ($users as $user)
                     {
                         $results['is_valid'] = false;
+                        $reasons['code'] = $code;
+                        $reasons['desc'] = $reply;
+                        $results['reasons'] = $reasons;
                         // $results[$user.'@'.$domain] = false;
                     }
                     continue;
@@ -208,7 +214,7 @@ class SMTP_validateEmail
                     // get code and msg from response
                     preg_match('/^([0-9]{3}) /ims', $reply, $matches);
                     $code = isset($matches[1]) ? $matches[1] : '';
-
+                    $this->debug("code: $code\n");
                     if ($code == '250')
                     {
                         // you received 250 so the email address was accepted
@@ -250,6 +256,9 @@ class SMTP_validateEmail
             else 
             {
                 $results['is_valid'] = false;
+                $reasons['code'] = -1;
+                $reasons['desc'] = "Domain is invalid";
+                $results['reasons'] = $reasons;
             }
         }
         return $results;
